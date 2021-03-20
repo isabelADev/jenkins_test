@@ -7,47 +7,29 @@ pipeline {
   strages {
     stage("Instal dependencies") {
         echo 'Installing dependencies ...'
-        sh 'npm install'
+        sh 'yarn install'
         echo 'Finished dependencies installation.'
     }
     stage("Build") {
       steps {
         echo 'Building application ...'
         echo "App version: ${NEW_VERSION}"
-        sh 'npm run build'
+        sh 'yarn build --output-path=dist'
         echo 'Finished building application.'
       }
     }
     stage("Test") {
       steps {
-      
+       echo 'Running tests ...'
+       sh 'yarn test'
+       echo 'Finished running tests'
       }
     }
-    stage("Deploy") {
-      when {
-        expression {
-          BRANCH_NAME == 'dev'
-        }
-      }
+    stage("E2E Test") {
       steps {
-        echo 'Deploying application ...'
-        withCredentials([
-          usesnamePassword(credentials: 'credentialId', usernameVariable: USER, passwordVariable: PWD)
-        ]) {
-          sh 'Do copy artifact to someplace and use ${USER} and ${PWD}' 
-        }
+       echo 'Running e2e tests ...'
+       sh 'yarn e2e'
+       echo 'Finished running e2e tests'
       }
     }
-  }
-  post {
-    always {
-    
-    }
-    success {
-    
-    }
-    failure {
-    
-    }
-  }
 }
